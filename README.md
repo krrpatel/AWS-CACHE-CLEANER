@@ -14,6 +14,10 @@ git clone https://github.com/krrpatel/AWS-CACHE-CLEANER.git
 python3 -m venv .venv && source .venv/bin/activate && pip install --upgrade pip && pip install python-telegram-bot schedule
 ```
 
+``` bash
+cd AWS-CACHE-CLEANER
+```
+
 ```bash
 python3 main.py
 ```
