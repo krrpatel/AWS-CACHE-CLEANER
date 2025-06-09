@@ -87,7 +87,7 @@ def main():
     asyncio.run(job())
 
     # Schedule job every day
-    schedule.every(1).day.do(lambda: asyncio.run(job()))
+    schedule.every(30).minutes.do(lambda: asyncio.run(job()))
 
     print("⏳ Monitoring started. Press Ctrl+C to stop.")
     while True:
