@@ -1,8 +1,6 @@
 import os
 import shutil
 import subprocess
-import schedule
-import time
 import json
 import asyncio
 import tracemalloc
@@ -11,7 +9,7 @@ from telegram import Bot
 tracemalloc.start()
 
 CONFIG_PATH = os.path.expanduser("~/.tg_config")
-THRESHOLD_GB = 29  # You can adjust this
+THRESHOLD_GB = 29  # Set your desired threshold
 
 def ask_user_credentials():
     print("🔐 Enter setup details for Telegram notifications")
@@ -36,7 +34,6 @@ def load_credentials():
         config = json.load(f)
     return config["token"], config["chat_id"], config["vps_id"]
 
-# ✅ Now checks full disk usage from "/"
 def get_used_storage_gb():
     result = subprocess.run(
         ['df', '--output=used', '--block-size=1G', '/'],
@@ -76,23 +73,17 @@ async def check_and_notify(bot, chat_id, vps_id):
 
     await bot.send_message(chat_id=chat_id, text=msg)
 
-def main():
+async def periodic_monitor():
     token, chat_id, vps_id = load_credentials()
     bot = Bot(token=token)
 
-    async def job():
-        await check_and_notify(bot, chat_id, vps_id)
-
-    # Run once on startup
-    asyncio.run(job())
-
-    # Schedule job every day
-    schedule.every(30).minutes.do(lambda: asyncio.run(job()))
-
-    print("⏳ Monitoring started. Press Ctrl+C to stop.")
     while True:
-        schedule.run_pending()
-        time.sleep(60)
+        await check_and_notify(bot, chat_id, vps_id)
+        await asyncio.sleep(1800)  # 30 minutes
+
+def main():
+    print("⏳ Monitoring started every 30 minutes. Press Ctrl+C to stop.")
+    asyncio.run(periodic_monitor())
 
 if __name__ == "__main__":
     main()
